@@ -51,7 +51,7 @@ export default function PostPage({ params }: PostPageProps) {
     notFound()
   }
 
-  // 构建面包屑
+  // 🔧 构建面包屑 - 设置为不可点击的显示项
   const breadcrumbs = [
     { name: '首页', href: '/' },
     ...params.slug.map((segment, index) => ({
@@ -74,15 +74,15 @@ export default function PostPage({ params }: PostPageProps) {
               <div className="flex items-center justify-between">
                 {/* 左侧：返回按钮 + 面包屑 */}
                 <div className="flex items-center space-x-4 min-w-0 flex-1">
-            <Link 
-              href="/" 
+                  <Link 
+                    href="/" 
                     className="inline-flex items-center bg-white dark:bg-gray-800 border-2 border-blue-600 dark:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 flex-shrink-0"
-            >
+                  >
                     <ArrowLeft className="w-4 h-4 mr-1" />
                     首页
                   </Link>
                   
-                  {/* 面包屑导航 */}
+                  {/* 🔧 面包屑导航 - 设置为不可点击 */}
                   <nav className="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400 min-w-0">
                     {breadcrumbs.map((breadcrumb, index) => (
                       <div key={index} className="flex items-center space-x-1">
@@ -94,12 +94,10 @@ export default function PostPage({ params }: PostPageProps) {
                             {breadcrumb.name}
                           </span>
                         ) : (
-                          <Link 
-                            href={breadcrumb.href}
-                            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
-                          >
+                          // 🔧 移除链接，改为纯文本显示
+                          <span className="text-gray-500 dark:text-gray-500 truncate cursor-default">
                             {breadcrumb.name}
-            </Link>
+                          </span>
                         )}
                       </div>
                     ))}
@@ -125,21 +123,21 @@ export default function PostPage({ params }: PostPageProps) {
             <div className="max-w-4xl mx-auto px-8 py-8">
               <article>
                 {/* 文章标题 */}
-              <header className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                  {post.title}
-                </h1>
-                {post.date && (
-                      <time className="text-gray-600 dark:text-gray-300 text-sm">
-                    发布于 {new Date(post.date).toLocaleDateString('zh-CN')}
-                  </time>
-                )}
-              </header>
-              
+                <header className="mb-8">
+                  <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                    {post.title}
+                  </h1>
+                  {post.date && (
+                    <time className="text-gray-600 dark:text-gray-300 text-sm">
+                      发布于 {new Date(post.date).toLocaleDateString('zh-CN')}
+                    </time>
+                  )}
+                </header>
+                
                 {/* 文章正文 */}
                 <div className="prose prose-lg max-w-none dark:prose-invert">
-                <SimpleMarkdownRenderer content={post.content} />
-              </div>
+                  <SimpleMarkdownRenderer content={post.content} />
+                </div>
               </article>
             </div>
           </div>

@@ -13,36 +13,51 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark')
   const [mounted, setMounted] = useState(false)
+  const [theme, setTheme] = useState<Theme>('dark')
 
   useEffect(() => {
-    // 从localStorage获取保存的主题，如果没有则默认使用深色模式
-    const savedTheme = localStorage.getItem('theme') as Theme
-    const initialTheme = savedTheme || 'dark' // 默认使用深色模式
-    
-    setTheme(initialTheme)
     setMounted(true)
+    
+    const savedTheme = localStorage.getItem('theme') as Theme | null
+    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+      setTheme(savedTheme)
+    }
+    
+    const htmlElement = document.documentElement
+    if (savedTheme === 'light') {
+      htmlElement.classList.remove('dark')
+    } else {
+      htmlElement.classList.add('dark')
+    }
   }, [])
 
   useEffect(() => {
-    if (mounted) {
-      localStorage.setItem('theme', theme)
-      // 更新HTML的class来应用主题
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
+    if (!mounted) return
+
+    localStorage.setItem('theme', theme)
+    
+    const htmlElement = document.documentElement
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark')
+    } else {
+      htmlElement.classList.remove('dark')
     }
   }, [theme, mounted])
 
   const toggleTheme = () => {
+    if (!mounted) return
     setTheme(prev => prev === 'light' ? 'dark' : 'light')
   }
 
+  const contextValue: ThemeContextType = {
+    theme: mounted ? theme : 'dark',
+    toggleTheme,
+    mounted
+  }
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   )

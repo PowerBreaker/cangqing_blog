@@ -7,11 +7,11 @@ import { useTheme } from '@/lib/theme'
 export default function ThemeToggle() {
   const { theme, toggleTheme, mounted } = useTheme()
 
-  // 在服务端渲染或组件未挂载时显示默认状态
+  // 🔧 在服务端渲染或组件未挂载时显示占位符
   if (!mounted) {
     return (
       <div className="relative p-2 rounded-xl bg-gray-100 dark:bg-gray-800 transition-all duration-300 w-10 h-10">
-        <Sun className="w-6 h-6 text-amber-500" />
+        <div className="w-6 h-6 animate-pulse bg-gray-300 dark:bg-gray-600 rounded"></div>
       </div>
     )
   }
@@ -21,6 +21,7 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       className="relative p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 group"
       aria-label={theme === 'light' ? '切换到夜间模式' : '切换到日间模式'}
+      suppressHydrationWarning
     >
       <div className="relative w-6 h-6">
         <Sun 

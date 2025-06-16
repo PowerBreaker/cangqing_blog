@@ -52,8 +52,8 @@ const SimpleMarkdownRenderer: React.FC<SimpleMarkdownRendererProps> = ({ content
                 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 mt-8 scroll-mt-20" 
                 {...props}
               >
-                {children}
-              </h1>
+              {children}
+            </h1>
             )
           },
           h2: ({ children, ...props }) => {
@@ -166,7 +166,7 @@ const SimpleMarkdownRenderer: React.FC<SimpleMarkdownRendererProps> = ({ content
           },
           blockquote: ({ children, ...props }) => (
             <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400 mb-4" {...props}>
-              {children}
+                {children}
             </blockquote>
           ),
           code: ({ children, className, ...props }) => {
