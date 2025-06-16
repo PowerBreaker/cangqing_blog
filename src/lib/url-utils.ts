@@ -8,14 +8,23 @@
  */
 export function safeDecodeURIComponent(str: string): string {
   try {
-    // 检查是否已经是解码后的字符串
-    const encoded = encodeURIComponent(str)
-    if (encoded === str) {
-      return str // 已经是原始字符串
+    // 如果字符串包含%符号，说明可能是编码的
+    if (str.includes('%')) {
+      // 尝试解码
+      let decoded = decodeURIComponent(str)
+      
+      // 如果解码后还包含%符号，可能是过度编码，再次解码
+      while (decoded.includes('%') && decoded !== str) {
+        const nextDecoded = decodeURIComponent(decoded)
+        if (nextDecoded === decoded) break // 防止无限循环
+        decoded = nextDecoded
+      }
+      
+      return decoded
     }
     
-    // 尝试解码
-    return decodeURIComponent(str)
+    // 没有%符号，直接返回
+    return str
   } catch (error) {
     // 解码失败，返回原字符串
     console.warn('Failed to decode URI component:', str, error)
