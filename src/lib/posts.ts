@@ -47,13 +47,17 @@ function getAllMarkdownFiles(dir: string, baseDir: string = postsDirectory): str
   return files
 }
 
-// 生成文章 slug（用于 URL）
+// 生成文章的 slug（用于 URL）
 function generateSlug(filePath: string): string {
+  // 移除.md扩展名，保持路径结构，使用正斜杠分隔
   return filePath
     .replace(/\.md$/, '')
     .replace(/\\/g, '/')
     .split('/')
-    .map(segment => encodeURIComponent(segment))
+    .map(segment => {
+      // 避免过度编码 - 只对必要的字符进行编码
+      return encodeURIComponent(segment.trim())
+    })
     .join('/')
 }
 
@@ -138,7 +142,8 @@ export function processWikiLinks(content: string): string {
     
     if (foundPost) {
       // 转换为markdown链接格式 - 可访问的链接
-      return `[${originalLinkText}](/post/${foundPost.slug})`
+      const { buildPostUrl } = require('./url-utils')
+      return `[${originalLinkText}](${buildPostUrl(foundPost.slug)})`
     } else {
       // 如果找不到对应文章，标记为不可访问的双链
       return `<span class="wikilink-notfound">${originalLinkText}</span>`

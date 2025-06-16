@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getAllPostSlugs, getPostBySlug, buildFileTree } from '@/lib/posts'
+import { processDynamicParams, safeDecodeURIComponent } from '@/lib/url-utils'
 import SimpleMarkdownRenderer from '@/components/SimpleMarkdownRenderer'
 import StaticFileTree from '@/components/StaticFileTree'
 import TableOfContents from '@/components/TableOfContents'
@@ -43,7 +44,9 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 }
 
 export default function PostPage({ params }: PostPageProps) {
-  const slug = params.slug.join('/')
+  // 🔧 使用新的URL处理工具，确保正确的编码处理
+  const { decodedParams, slug } = processDynamicParams(params.slug)
+  
   const post = getPostBySlug(slug)
   const fileTree = buildFileTree()
   
@@ -54,9 +57,9 @@ export default function PostPage({ params }: PostPageProps) {
   // 🔧 构建面包屑 - 设置为不可点击的显示项
   const breadcrumbs = [
     { name: '首页', href: '/' },
-    ...params.slug.map((segment, index) => ({
-      name: decodeURIComponent(segment),
-      href: `/post/${params.slug.slice(0, index + 1).join('/')}`
+    ...decodedParams.map((segment, index) => ({
+      name: segment,
+      href: `/post/${decodedParams.slice(0, index + 1).map(s => encodeURIComponent(s)).join('/')}`
     }))
   ]
   

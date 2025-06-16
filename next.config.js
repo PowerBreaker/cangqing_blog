@@ -9,6 +9,9 @@ const nextConfig = {
     outputFileTracingIncludes: {
       '/': ['./博客/**/*'],
     },
+  },
+  async generateBuildId() {
+    return 'blog-build'
   }
 }
 

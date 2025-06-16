@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, ChevronRight, Folder } from 'lucide-react'
 import { FileTreeNode } from '@/lib/posts'
+import { buildPostUrl } from '@/lib/url-utils'
 import ThemeToggle from './ThemeToggle'
 
 interface StaticFileTreeProps {
@@ -109,7 +110,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, currentPath, expandedP
                 isCurrentArticle ? '' : 'hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}>
                 <Link 
-                  href={`/post/${node.slug}`}
+                  href={buildPostUrl(node.slug)}
                   className={`text-sm transition-colors truncate block w-full ${
                     isCurrentArticle 
                       ? 'text-blue-900 dark:text-blue-100 font-semibold' 
