@@ -74,11 +74,16 @@ export default function PostPageClient({ post }: PostPageClientProps) {
       </div>
       
       {/* 右侧目录区域 - 桌面端固定，移动端可隐藏 */}
+      <div className="w-[416px] flex-shrink-0 bg-gray-50 dark:bg-gray-900 pr-32 hidden md:block">
+        <div className="sticky p-6" style={{ top: '78px' }}>
+          <TableOfContents content={post.content} />
+        </div>
+      </div>
+
+      {/* 移动端目录面板 */}
       <div className={`
-        w-[416px] flex-shrink-0 bg-gray-50 dark:bg-gray-900 pr-32
-        md:relative md:translate-x-0 md:static
-        fixed top-0 right-0 z-40 md:w-[416px] w-80 h-full md:bg-gray-50 md:dark:bg-gray-900 bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out md:transition-none
-        ${isTocOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+        md:hidden fixed top-0 right-0 z-40 w-80 h-full bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out
+        ${isTocOpen ? 'translate-x-0' : 'translate-x-full'}
       `}>
         <div className="sticky p-6 md:pt-[78px] pt-16 h-full overflow-y-auto">
           <div className="md:hidden mb-4 flex justify-between items-center">
