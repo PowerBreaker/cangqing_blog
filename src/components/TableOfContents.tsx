@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { ChevronDown, ChevronRight, List } from 'lucide-react'
 
 interface TocItem {
@@ -17,6 +17,10 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => {
   const [tocItems, setTocItems] = useState<TocItem[]>([])
   const [isExpanded, setIsExpanded] = useState(true)
   const [activeId, setActiveId] = useState<string>('')
+  const [isScrolling, setIsScrolling] = useState(false)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const scrollbarHideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     // 解析markdown内容，提取标题
@@ -27,7 +31,18 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => {
 
       while ((match = headingRegex.exec(content)) !== null) {
         const level = match[1].length
-        const text = match[2].trim()
+        let text = match[2].trim()
+        
+        // 清理Markdown语法符号
+        text = text
+          .replace(/\*\*(.*?)\*\*/g, '$1')  // 去掉加粗 **text**
+          .replace(/\*(.*?)\*/g, '$1')      // 去掉斜体 *text*
+          .replace(/`(.*?)`/g, '$1')        // 去掉行内代码 `text`
+          .replace(/~~(.*?)~~/g, '$1')      // 去掉删除线 ~~text~~
+          .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 去掉链接，保留文本 [text](url)
+          .replace(/!\[(.*?)\]\(.*?\)/g, '$1') // 去掉图片，保留alt文本
+          .trim()
+        
         const id = text
           .toLowerCase()
           .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
@@ -66,6 +81,40 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // 目录导航滚动处理 - 管理滚动条显示/隐藏
+  const handleTocScroll = useCallback(() => {
+    if (scrollContainerRef.current) {
+      // 显示滚动条
+      setIsScrolling(true)
+      
+      // 清除之前的延时器
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+      
+      if (scrollbarHideTimeoutRef.current) {
+        clearTimeout(scrollbarHideTimeoutRef.current)
+      }
+      
+      // 延迟隐藏滚动条
+      scrollbarHideTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false)
+      }, 1000) // 滚动停止后1秒隐藏滚动条
+    }
+  }, [])
+
+  // 清理防抖延时器
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+      if (scrollbarHideTimeoutRef.current) {
+        clearTimeout(scrollbarHideTimeoutRef.current)
+      }
+    }
+  }, [])
+
   const scrollToHeading = (id: string) => {
     const element = document.getElementById(id)
     if (element) {
@@ -85,10 +134,10 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => {
   }
 
   return (
-    <div className="absolute top-[73px] right-4 z-[9999] w-72 max-h-[80vh] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden">
-      {/* 标题栏 */}
+    <div className="w-full">
+      {/* 标题栏 - 简洁样式 */}
       <div 
-        className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+        className="flex items-center justify-between px-2 py-3 cursor-pointer hover:opacity-70 transition-opacity"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center space-x-2">
@@ -103,25 +152,37 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => {
         )}
       </div>
 
-      {/* 目录内容 */}
+      {/* 目录内容 - 去掉边框和背景色差异 */}
       {isExpanded && (
-        <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <div 
+          ref={scrollContainerRef}
+          className={`max-h-[70vh] overflow-y-auto toc-scroll-container ${isScrolling ? 'scrolling' : ''}`}
+          onScroll={handleTocScroll}
+          style={{ 
+            overscrollBehavior: 'contain',
+            contain: 'layout style paint'
+          }}
+        >
           <div className="py-2">
             {tocItems.map((item, index) => (
               <button
                 key={index}
                 onClick={() => scrollToHeading(item.id)}
                 className={`
-                  w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors
+                  w-full text-left px-2 py-2 text-sm hover:opacity-70 transition-opacity
                   ${activeId === item.id 
-                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-r-2 border-blue-500' 
+                    ? 'text-blue-600 dark:text-blue-400 font-medium' 
                     : 'text-gray-700 dark:text-gray-300'
                   }
                 `}
-                style={{ paddingLeft: `${(item.level - 1) * 12 + 16}px` }}
+                style={{ paddingLeft: `${(item.level - 1) * 12 + 8}px` }}
               >
                 <div className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-700 dark:bg-gray-300 flex-shrink-0"></span>
+                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                    activeId === item.id 
+                      ? 'bg-blue-600 dark:bg-blue-400' 
+                      : 'bg-gray-400 dark:bg-gray-500'
+                  }`}></span>
                   <span className="truncate">{item.text}</span>
                 </div>
               </button>

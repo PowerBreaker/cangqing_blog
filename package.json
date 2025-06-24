@@ -10,6 +10,7 @@
     "update-blog": "node scripts/update-blog.js"
   },
   "dependencies": {
+    "framer-motion": "^12.19.1",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.294.0",
     "next": "14.0.4",

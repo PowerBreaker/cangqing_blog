@@ -115,4 +115,115 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+/* 确保导航栏滚动条独立性 */
+.navigation-scroll-container {
+  position: relative;
+  isolation: isolate;
+  overscroll-behavior: contain;
+  scroll-behavior: auto; /* 移除平滑滚动，避免页面切换时的滚动动画 */
+  contain: layout style paint;
+}
+
+/* 自定义滚动条样式 - 默认隐藏 */
+.navigation-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.navigation-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.navigation-scroll-container::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+  transition: background-color 0.3s ease;
+}
+
+.navigation-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 滚动时显示滚动条 */
+.navigation-scroll-container.scrolling::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.navigation-scroll-container.scrolling::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 暗色模式下的滚动条 */
+.dark .navigation-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.dark .navigation-scroll-container.scrolling::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark .navigation-scroll-container.scrolling::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 滚动容器隔离 */
+.scroll-isolated {
+  contain: layout style paint;
+  overscroll-behavior: contain;
+}
+
+/* 固定导航栏样式 */
+.fixed-navigation {
+  position: fixed;
+  contain: layout style paint;
+  will-change: scroll-position;
+}
+
+/* 目录导航滚动条样式 - 默认隐藏 */
+.toc-scroll-container {
+  position: relative;
+  isolation: isolate;
+  overscroll-behavior: contain;
+  contain: layout style paint;
+}
+
+.toc-scroll-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.toc-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.toc-scroll-container::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.toc-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 目录导航滚动时显示滚动条 */
+.toc-scroll-container.scrolling::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.toc-scroll-container.scrolling::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 目录导航暗色模式下的滚动条 */
+.dark .toc-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.dark .toc-scroll-container.scrolling::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark .toc-scroll-container.scrolling::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 } 

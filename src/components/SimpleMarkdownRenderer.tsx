@@ -10,6 +10,9 @@ interface SimpleMarkdownRendererProps {
 }
 
 const SimpleMarkdownRenderer: React.FC<SimpleMarkdownRendererProps> = ({ content }) => {
+  // 用于跟踪已使用的ID，避免重复
+  const usedIds = new Set<string>()
+  
   // 预处理内容，保留空行和段落间距
   const processContent = (text: string) => {
     // 将多个连续空行转换为段落分隔符
@@ -27,12 +30,29 @@ const SimpleMarkdownRenderer: React.FC<SimpleMarkdownRendererProps> = ({ content
 
   const processedContent = processContent(content)
 
-  // 生成标题ID的函数
+  // 生成标题ID的函数，确保唯一性
   const generateHeadingId = (text: string): string => {
-    return text
+    const baseId = text
       .toLowerCase()
       .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
       .replace(/^-+|-+$/g, '')
+      .substring(0, 50) // 限制长度
+    
+    if (!baseId) {
+      return 'heading-' + Math.random().toString(36).substr(2, 9)
+    }
+    
+    let finalId = baseId
+    let counter = 1
+    
+    // 如果ID已存在，添加数字后缀
+    while (usedIds.has(finalId)) {
+      finalId = `${baseId}-${counter}`
+      counter++
+    }
+    
+    usedIds.add(finalId)
+    return finalId
   }
 
   return (
@@ -62,7 +82,7 @@ const SimpleMarkdownRenderer: React.FC<SimpleMarkdownRendererProps> = ({ content
             return (
               <h2 
                 id={id} 
-                className="text-2xl font-bold text-gray-900 dark:text-white mb-4 mt-6 scroll-mt-20" 
+                className="text-2xl font-bold text-gray-900 dark:text-white mb-4 mt-10 scroll-mt-20" 
                 {...props}
               >
                 {children}
@@ -75,7 +95,7 @@ const SimpleMarkdownRenderer: React.FC<SimpleMarkdownRendererProps> = ({ content
             return (
               <h3 
                 id={id} 
-                className="text-xl font-bold text-gray-900 dark:text-white mb-3 mt-5 scroll-mt-20" 
+                className="text-xl font-bold text-gray-900 dark:text-white mb-3 mt-8 scroll-mt-20" 
                 {...props}
               >
                 {children}
@@ -88,7 +108,7 @@ const SimpleMarkdownRenderer: React.FC<SimpleMarkdownRendererProps> = ({ content
             return (
               <h4 
                 id={id} 
-                className="text-lg font-semibold text-gray-900 dark:text-white mb-2 mt-4 scroll-mt-20" 
+                className="text-lg font-semibold text-gray-900 dark:text-white mb-2 mt-6 scroll-mt-20" 
                 {...props}
               >
                 {children}
@@ -221,6 +241,41 @@ const SimpleMarkdownRenderer: React.FC<SimpleMarkdownRendererProps> = ({ content
               {children}
             </td>
           ),
+          img: ({ src, alt, ...props }) => {
+            // 解析alt文本中的尺寸参数 (如 "image.png|30" 或 "image.png|30x40")
+            let width, height, displayAlt = alt || ''
+            
+            if (alt?.includes('|')) {
+              const [altText, sizeParam] = alt.split('|')
+              displayAlt = altText
+              
+              if (sizeParam) {
+                if (sizeParam.includes('x')) {
+                  // 格式: width x height
+                  const [w, h] = sizeParam.split('x')
+                  width = w.trim()
+                  height = h.trim()
+                } else {
+                  // 格式: 只有宽度
+                  width = sizeParam.trim()
+                }
+              }
+            }
+            
+            const style: React.CSSProperties = {}
+            if (width) style.width = isNaN(Number(width)) ? width : `${width}px`
+            if (height) style.height = isNaN(Number(height)) ? height : `${height}px`
+            
+            return (
+              <img 
+                src={src} 
+                alt={displayAlt}
+                style={style}
+                className="rounded-lg shadow-sm my-4 max-w-full h-auto"
+                {...props}
+              />
+            )
+          },
         }}
       >
         {processedContent}

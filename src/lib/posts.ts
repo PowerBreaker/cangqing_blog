@@ -142,8 +142,9 @@ export function processWikiLinks(content: string): string {
     
     if (foundPost) {
       // 转换为markdown链接格式 - 可访问的链接
-      const { buildPostUrl } = require('./url-utils')
-      return `[${originalLinkText}](${buildPostUrl(foundPost.slug)})`
+      // 修复：避免运行时require，直接构建URL
+      const postUrl = `/post/${foundPost.slug}`
+      return `[${originalLinkText}](${postUrl})`
     } else {
       // 如果找不到对应文章，标记为不可访问的双链
       return `<span class="wikilink-notfound">${originalLinkText}</span>`
@@ -184,6 +185,40 @@ export function getPostBySlug(slug: string): PostData | null {
   }
 }
 
+// 根据相对路径获取文章数据（用于首页配置）
+export function getPostByPath(relativePath: string): PostData | null {
+  try {
+    const fullPath = path.join(postsDirectory, relativePath)
+    
+    if (!fs.existsSync(fullPath)) {
+      console.error(`Home page file not found: ${fullPath}`)
+      return null
+    }
+    
+    const fileContents = fs.readFileSync(fullPath, 'utf8')
+    const { data, content } = matter(fileContents)
+    
+    // 处理双链语法
+    const processedContent = processWikiLinks(content)
+    
+    // 生成slug用于内部链接
+    const slug = generateSlug(relativePath)
+    
+    return {
+      slug,
+      title: data.title || path.basename(relativePath, '.md'),
+      content: processedContent,
+      date: data.date || null,
+      excerpt: data.excerpt || content.slice(0, 150) + '...',
+      path: fullPath,
+      relativePath: relativePath.replace(/\\/g, '/')
+    }
+  } catch (error) {
+    console.error(`Error reading post at path ${relativePath}:`, error)
+    return null
+  }
+}
+
 // 获取所有可能的文章路径（用于 getStaticPaths）
 export function getAllPostSlugs(): { params: { slug: string[] } }[] {
   const fileNames = getAllMarkdownFiles(postsDirectory)
@@ -206,9 +241,23 @@ export interface FileTreeNode {
   children?: FileTreeNode[]
 }
 
+// 缓存文件树结构，避免重复计算导致组件重新挂载
+let cachedFileTree: FileTreeNode[] | null = null
+let lastBuildTime = 0
+const CACHE_DURATION = 5000 // 5秒缓存
+
 export function buildFileTree(): FileTreeNode[] {
+  const now = Date.now()
+  
+  // 如果有缓存且未过期，直接返回缓存结果
+  if (cachedFileTree && (now - lastBuildTime) < CACHE_DURATION) {
+    return cachedFileTree
+  }
+  
   if (!fs.existsSync(postsDirectory)) {
-    return []
+    cachedFileTree = []
+    lastBuildTime = now
+    return cachedFileTree
   }
 
   function buildTree(dirPath: string, baseName: string = ''): FileTreeNode[] {
@@ -252,5 +301,11 @@ export function buildFileTree(): FileTreeNode[] {
     return items
   }
 
-  return buildTree(postsDirectory)
+  const result = buildTree(postsDirectory)
+  
+  // 缓存结果
+  cachedFileTree = result
+  lastBuildTime = now
+  
+  return result
 } 
