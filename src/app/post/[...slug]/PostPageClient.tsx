@@ -43,7 +43,7 @@ export default function PostPageClient({ post }: PostPageClientProps) {
 
       {/* 中间正文区域 - 响应式布局 */}
       <div className="flex-1 min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center overflow-y-auto overscroll-auto">
-        <div className="w-full max-w-3xl px-4 md:px-8 pt-16 md:pt-[78px] pb-32 md:pb-[128px] md:ml-[85px]">
+        <div className="w-full max-w-3xl px-4 md:px-8 pt-16 md:pt-[78px] pb-32 md:pb-[128px]" style={{ marginLeft: '85px' }}>
           <article className="w-full">
             {/* 文章标题 */}
             <header className="mb-8" style={{ textAlign: 'left' }}>
@@ -75,9 +75,10 @@ export default function PostPageClient({ post }: PostPageClientProps) {
       
       {/* 右侧目录区域 - 桌面端固定，移动端可隐藏 */}
       <div className={`
-        md:w-[416px] md:flex-shrink-0 md:bg-gray-50 md:dark:bg-gray-900 md:pr-32 md:relative md:translate-x-0
-        fixed md:static top-0 right-0 z-40 w-80 h-full bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out
-        ${isTocOpen ? 'translate-x-0' : 'translate-x-full'}
+        w-[416px] flex-shrink-0 bg-gray-50 dark:bg-gray-900 pr-32
+        md:relative md:translate-x-0 md:static
+        fixed top-0 right-0 z-40 md:w-[416px] w-80 h-full md:bg-gray-50 md:dark:bg-gray-900 bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out md:transition-none
+        ${isTocOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
       `}>
         <div className="sticky p-6 md:pt-[78px] pt-16 h-full overflow-y-auto">
           <div className="md:hidden mb-4 flex justify-between items-center">
