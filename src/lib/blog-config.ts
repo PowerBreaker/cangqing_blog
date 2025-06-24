@@ -16,14 +16,35 @@ interface BlogConfig {
 // 在服务端读取配置文件
 function getBlogConfig(): BlogConfig {
   try {
-    // 🔧 优化：使用process.cwd()绝对路径读取配置文件
-    const path = require('path')
-    const configPath = path.resolve(process.cwd(), 'blog.config.js')
+    // 🔧 修复：多种方式尝试读取配置文件
+    let config = null
     
-    // 清除require缓存，确保获取最新配置
-    delete require.cache[configPath]
+    // 方式1：使用绝对路径
+    try {
+      const path = require('path')
+      const configPath = path.resolve(process.cwd(), 'blog.config.js')
+      // 清除require缓存
+      delete require.cache[configPath]
+      config = require(configPath)
+    } catch (e1) {
+      console.warn('绝对路径读取失败:', e1 instanceof Error ? e1.message : String(e1))
+      
+      // 方式2：尝试相对路径
+      try {
+        config = require('../../blog.config.js')
+      } catch (e2) {
+        console.warn('相对路径读取失败:', e2 instanceof Error ? e2.message : String(e2))
+        
+        // 方式3：尝试直接从根目录
+        try {
+          config = require('../../../blog.config.js')
+        } catch (e3) {
+          console.warn('根目录读取失败:', e3 instanceof Error ? e3.message : String(e3))
+          throw new Error('所有路径都无法读取配置文件')
+        }
+      }
+    }
     
-    const config = require(configPath)
     console.log('成功读取博客配置:', config?.name || '未知')
     return config
   } catch (error) {

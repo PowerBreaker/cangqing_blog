@@ -11,8 +11,6 @@ import ThemeToggle from './ThemeToggle'
 
 interface StaticFileTreeProps {
   tree: FileTreeNode[]
-  onLinkClick?: () => void
-  isMobile?: boolean
 }
 
 interface TreeNodeProps {
@@ -21,7 +19,6 @@ interface TreeNodeProps {
   currentPath?: string
   expandedPaths: Set<string>
   onToggle: (path: string) => void
-  onLinkClick?: () => void
 }
 
 // 用于保存和获取展开状态的工具函数
@@ -64,7 +61,7 @@ const saveScrollPosition = (position: number) => {
   }
 }
 
-const TreeNode: React.FC<TreeNodeProps> = ({ node, level, currentPath, expandedPaths, onToggle, onLinkClick }) => {
+const TreeNode: React.FC<TreeNodeProps> = ({ node, level, currentPath, expandedPaths, onToggle }) => {
   const isExpanded = expandedPaths.has(node.path)
   const isMarkdownFile = node.type === 'file' && node.name.endsWith('.md')
   
@@ -120,10 +117,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, currentPath, expandedP
                       ? 'text-blue-600 dark:text-blue-400 font-semibold' 
                       : 'text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400'
                   }`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onLinkClick?.()
-                  }}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   {node.name.replace(/\.md$/, '')}
                 </Link>
@@ -147,7 +141,6 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, currentPath, expandedP
               currentPath={currentPath}
               expandedPaths={expandedPaths}
               onToggle={onToggle}
-              onLinkClick={onLinkClick}
             />
           ))}
         </div>
@@ -156,7 +149,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, currentPath, expandedP
   )
 }
 
-const StaticFileTree: React.FC<StaticFileTreeProps> = ({ tree, onLinkClick, isMobile = false }) => {
+const StaticFileTree: React.FC<StaticFileTreeProps> = ({ tree }) => {
   const pathname = usePathname()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -274,11 +267,7 @@ const StaticFileTree: React.FC<StaticFileTreeProps> = ({ tree, onLinkClick, isMo
   }, [])
 
   return (
-    <div className={
-      isMobile 
-        ? "h-full min-h-screen w-full flex flex-col bg-gray-50 dark:bg-gray-900 fixed-navigation scroll-isolated pt-14"
-        : "h-full min-h-screen w-full flex flex-col bg-gray-50 dark:bg-gray-900 fixed-navigation scroll-isolated"
-    }>
+    <div className="fixed left-36 top-0 h-full min-h-screen w-60 flex flex-col bg-gray-50 dark:bg-gray-900 z-10 fixed-navigation scroll-isolated">
       <div className="px-3 py-6 flex-shrink-0 mt-8" style={{ transform: 'scale(1.05)', transformOrigin: 'top left' }}>
         <div className="flex flex-col items-start space-y-4">
           {/* Logo */}
@@ -337,7 +326,6 @@ const StaticFileTree: React.FC<StaticFileTreeProps> = ({ tree, onLinkClick, isMo
             currentPath={pathname}
             expandedPaths={expandedPaths}
             onToggle={handleToggle}
-            onLinkClick={onLinkClick}
           />
         ))}
       </div>
