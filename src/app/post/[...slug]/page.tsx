@@ -67,38 +67,40 @@ export default function PostPage({ params }: PostPageProps) {
     <>
       {/* 中间正文区域 - 弹性宽度，居中显示 */}
       <div className="flex-1 min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center overflow-y-auto overscroll-auto">
-        <div className="w-full max-w-3xl px-8" style={{ paddingTop: '78px', paddingBottom: '128px', marginLeft: '85px' }}>
-          <article className="w-full">
-            {/* 文章标题 */}
-            <header className="mb-8" style={{ textAlign: 'left' }}>
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4" style={{ textAlign: 'left' }}>
-                {post.title}
-              </h1>
-              {post.date && (
-                <time className="text-gray-600 dark:text-gray-300 text-sm" style={{ textAlign: 'left' }}>
-                  发布于 {new Date(post.date).toLocaleDateString('zh-CN')}
-                </time>
-              )}
-            </header>
-            
-            {/* 文章正文 */}
-            <div 
-              className="prose prose-lg max-w-none dark:prose-invert" 
-              style={{ 
-                fontSize: '14px',
-                transform: 'scale(0.9)',
-                transformOrigin: 'top left',
-                width: '111.11%'
-              }}
-            >
-              <SimpleMarkdownRenderer content={post.content} />
-            </div>
-          </article>
+        <div className="w-full max-w-3xl px-4 lg:px-8 lg:ml-20">
+          <div className="pt-4 lg:pt-20 pb-16 lg:pb-32">
+            <article className="w-full">
+              {/* 文章标题 */}
+              <header className="mb-8" style={{ textAlign: 'left' }}>
+                <h1 className="text-2xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4" style={{ textAlign: 'left' }}>
+                  {post.title}
+                </h1>
+                {post.date && (
+                  <time className="text-gray-600 dark:text-gray-300 text-sm" style={{ textAlign: 'left' }}>
+                    发布于 {new Date(post.date).toLocaleDateString('zh-CN')}
+                  </time>
+                )}
+              </header>
+              
+              {/* 文章正文 */}
+              <div 
+                className="prose prose-sm lg:prose-lg max-w-none dark:prose-invert" 
+                style={{ 
+                  fontSize: '14px',
+                  transform: 'scale(1) lg:scale(0.9)',
+                  transformOrigin: 'top left',
+                  width: '100% lg:111.11%'
+                }}
+              >
+                <SimpleMarkdownRenderer content={post.content} />
+              </div>
+            </article>
+          </div>
         </div>
       </div>
       
-      {/* 右侧目录区域 - 固定宽度，增加右边距为500% */}
-      <div className="w-[416px] flex-shrink-0 bg-gray-50 dark:bg-gray-900 pr-32">
+      {/* 右侧目录区域 - 桌面端显示，移动端隐藏 */}
+      <div className="hidden lg:block w-[416px] flex-shrink-0 bg-gray-50 dark:bg-gray-900 pr-32">
         <div className="sticky p-6" style={{ top: '78px' }}>
           <TableOfContents content={post.content} />
         </div>

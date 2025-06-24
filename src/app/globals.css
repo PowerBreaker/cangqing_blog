@@ -33,6 +33,25 @@
 }
 
 @layer components {
+  /* 移动端适配 */
+  .mobile-optimized {
+    @apply block lg:hidden;
+  }
+  
+  .desktop-only {
+    @apply hidden lg:block;
+  }
+  
+  /* 移动端文字大小调整 */
+  .mobile-text-adjustments {
+    @apply text-sm lg:text-base;
+  }
+  
+  /* 移动端间距调整 */
+  .mobile-spacing {
+    @apply px-4 lg:px-8 py-2 lg:py-4;
+  }
+
   /* 渐变按钮 */
   .btn-gradient {
     @apply bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg;
@@ -72,6 +91,49 @@
   
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400 dark:bg-gray-500;
+  }
+}
+
+/* 移动端优化的Prose样式 */
+@media (max-width: 1024px) {
+  .prose {
+    @apply text-sm leading-relaxed;
+  }
+  
+  .prose h1 {
+    @apply text-xl font-bold mb-4;
+  }
+  
+  .prose h2 {
+    @apply text-lg font-semibold mb-3;
+  }
+  
+  .prose h3 {
+    @apply text-base font-medium mb-2;
+  }
+  
+  .prose p {
+    @apply mb-3 text-sm;
+  }
+  
+  .prose ul, .prose ol {
+    @apply mb-3 pl-4;
+  }
+  
+  .prose li {
+    @apply mb-1 text-sm;
+  }
+  
+  .prose blockquote {
+    @apply border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400 mb-3;
+  }
+  
+  .prose code {
+    @apply text-xs bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded;
+  }
+  
+  .prose pre {
+    @apply text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded-lg overflow-x-auto mb-3;
   }
 }
 
@@ -206,7 +268,6 @@ body {
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* 目录导航滚动时显示滚动条 */
 .toc-scroll-container.scrolling::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2);
 }
@@ -215,7 +276,6 @@ body {
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* 目录导航暗色模式下的滚动条 */
 .dark .toc-scroll-container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
