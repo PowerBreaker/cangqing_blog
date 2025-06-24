@@ -42,17 +42,12 @@ export default function BlogLayout({ children, fileTree }: BlogLayoutProps) {
         />
       )}
 
-      <div className="flex min-h-screen">
-        {/* 左侧文件树导航 */}
-        <div className={`
-          fixed lg:relative top-0 left-0 z-50 lg:z-auto
-          w-[280px] lg:w-[315px] h-full lg:h-auto
-          transform transition-transform duration-300 ease-in-out lg:transform-none
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          flex-shrink-0 lg:block
-        `}>
+      {/* 桌面端：恢复原有的flex布局 */}
+      <div className="hidden lg:flex min-h-screen">
+        {/* 桌面端左侧文件树导航 - 固定宽度 */}
+        <div className="w-[315px] flex-shrink-0">
           <ErrorBoundary fallback={
-            <div className="w-full h-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+            <div className="w-[315px] h-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
               <div className="text-center">
                 <div className="text-gray-400 text-2xl mb-2">📂</div>
                 <p className="text-gray-500 dark:text-gray-400 text-sm">导航栏加载失败</p>
@@ -66,8 +61,39 @@ export default function BlogLayout({ children, fileTree }: BlogLayoutProps) {
           </ErrorBoundary>
         </div>
         
-        {/* 页面内容区域 */}
-        <main className="flex-1 lg:ml-0 pt-14 lg:pt-0 min-w-0">
+        {/* 桌面端页面内容区域 */}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
+      </div>
+
+      {/* 移动端：独立的布局 */}
+      <div className="lg:hidden">
+        {/* 移动端侧边导航 */}
+        <div className={`
+          fixed top-0 left-0 z-50
+          w-[280px] h-full
+          transform transition-transform duration-300 ease-in-out
+          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}>
+          <ErrorBoundary fallback={
+            <div className="w-full h-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+              <div className="text-center">
+                <div className="text-gray-400 text-2xl mb-2">📂</div>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">导航栏加载失败</p>
+              </div>
+            </div>
+          }>
+            <StaticFileTree 
+              tree={fileTree} 
+              onLinkClick={() => setIsMobileMenuOpen(false)}
+              isMobile={true}
+            />
+          </ErrorBoundary>
+        </div>
+        
+        {/* 移动端页面内容区域 */}
+        <main className="pt-14 min-w-0">
           <ErrorBoundary>
             {children}
           </ErrorBoundary>

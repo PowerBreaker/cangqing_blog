@@ -12,6 +12,7 @@ import ThemeToggle from './ThemeToggle'
 interface StaticFileTreeProps {
   tree: FileTreeNode[]
   onLinkClick?: () => void
+  isMobile?: boolean
 }
 
 interface TreeNodeProps {
@@ -155,7 +156,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, currentPath, expandedP
   )
 }
 
-const StaticFileTree: React.FC<StaticFileTreeProps> = ({ tree, onLinkClick }) => {
+const StaticFileTree: React.FC<StaticFileTreeProps> = ({ tree, onLinkClick, isMobile = false }) => {
   const pathname = usePathname()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -273,7 +274,11 @@ const StaticFileTree: React.FC<StaticFileTreeProps> = ({ tree, onLinkClick }) =>
   }, [])
 
   return (
-    <div className="h-full min-h-screen w-full lg:w-60 flex flex-col bg-gray-50 dark:bg-gray-900 fixed-navigation scroll-isolated pt-14 lg:pt-0">
+    <div className={
+      isMobile 
+        ? "h-full min-h-screen w-full flex flex-col bg-gray-50 dark:bg-gray-900 fixed-navigation scroll-isolated pt-14"
+        : "h-full min-h-screen w-full flex flex-col bg-gray-50 dark:bg-gray-900 fixed-navigation scroll-isolated"
+    }>
       <div className="px-3 py-6 flex-shrink-0 mt-8" style={{ transform: 'scale(1.05)', transformOrigin: 'top left' }}>
         <div className="flex flex-col items-start space-y-4">
           {/* Logo */}
