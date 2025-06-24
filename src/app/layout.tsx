@@ -37,12 +37,15 @@ export default function RootLayout({
   // 读取博客配置
   const config = getBlogConfig()
   
+  // 🔧 确保主题模式有默认值，防止配置读取失败
+  const defaultMode = config?.theme?.defaultMode || 'dark'
+  
   // 主题脚本内容
   const themeScript = `
     (function() {
       try {
         var theme;
-        var defaultMode = '${config.theme.defaultMode}';
+        var defaultMode = '${defaultMode}';
         
         // 从localStorage获取保存的主题偏好
         var savedTheme = null;
@@ -106,7 +109,7 @@ export default function RootLayout({
       } catch (error) {
         // 如果出错，使用默认主题
         console.warn('主题脚本执行失败:', error);
-        var defaultMode = '${config.theme.defaultMode}';
+        var defaultMode = '${defaultMode}';
         try {
           if (defaultMode === 'dark') {
             document.documentElement.classList.add('dark');

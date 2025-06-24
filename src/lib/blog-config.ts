@@ -16,8 +16,14 @@ interface BlogConfig {
 // 在服务端读取配置文件
 function getBlogConfig(): BlogConfig {
   try {
-    // 在Next.js中，我们需要使用require来读取配置文件
-    const config = require('../../blog.config.js')
+    // 🔧 修复：使用绝对路径从项目根目录读取配置文件
+    const path = require('path')
+    const configPath = path.resolve(process.cwd(), 'blog.config.js')
+    
+    // 清除require缓存，确保获取最新配置
+    delete require.cache[configPath]
+    
+    const config = require(configPath)
     return config
   } catch (error) {
     console.error('读取博客配置失败:', error)
