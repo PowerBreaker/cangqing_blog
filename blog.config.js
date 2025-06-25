@@ -24,12 +24,12 @@
 
 const blogConfig = {
   // 博客基本信息
-  name: '青之鹰博客',
-  description: '记录思考与生活，快速搭建博客',
+  name: '青阳博客',
+  description: '青阳之心，风与火',
   
   // 首页显示的文章路径（相对于整个项目的相对路径）
   // 支持Windows路径分隔符（\），会自动转换为标准路径分隔符
-  homePage: '博客\\_我是谁\\首页.md',
+  homePage: '博客/1_青阳心/有关于我/索引.md',
   
   // Logo 图片路径（相对于 public 目录），进入qing_blog\public，找到logo文件，进行替换就可以，保持名字不变
   logo: '/logo.png',
