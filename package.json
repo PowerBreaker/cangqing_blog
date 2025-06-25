@@ -1,0 +1,14 @@
+{
+  "name": "qing-blog-simple",
+  "version": "1.0.0",
+  "description": "青之鹰博客 - 简化版用户接口",
+  "scripts": {
+    "dev": "cd qing_blog && npm run dev",
+    "build": "cd qing_blog && npm run build",
+    "update-blog": "cd qing_blog && npm run update-blog",
+    "install-deps": "cd qing_blog && npm install"
+  },
+  "keywords": ["blog", "markdown", "static-site"],
+  "author": "青之鹰",
+  "license": "MIT"
+} 
