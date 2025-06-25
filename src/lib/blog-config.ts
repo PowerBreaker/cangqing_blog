@@ -13,10 +13,26 @@ interface BlogConfig {
   }
 }
 
+// 默认配置
+const defaultConfig: BlogConfig = {
+  name: '青阳博客',
+  description: '青阳的个人博客，记录思考与生活',
+  homePage: '1_青阳心/有关于我/索引.md',
+  logo: '/logo.png',
+  theme: {
+    defaultMode: 'dark'
+  }
+}
+
 // 在服务端读取配置文件
 function getBlogConfig(): BlogConfig {
+  // 如果在客户端环境，直接返回默认配置
+  if (typeof window !== 'undefined') {
+    return defaultConfig
+  }
+  
   try {
-    // 🔧 修复：多种方式尝试读取配置文件
+    // 🔧 只在服务端环境中读取配置文件
     let config = null
     
     // 方式1：使用绝对路径
@@ -46,19 +62,11 @@ function getBlogConfig(): BlogConfig {
     }
     
     console.log('成功读取博客配置:', config?.name || '未知')
-    return config
+    return config || defaultConfig
   } catch (error) {
     console.error('读取博客配置失败，使用默认配置:', error instanceof Error ? error.message : String(error))
     // 返回默认配置
-    return {
-      name: '青阳博客',
-      description: '青阳的个人博客，记录思考与生活',
-      homePage: '1_青阳心/有关于我/索引.md',
-      logo: '/logo.png',
-      theme: {
-        defaultMode: 'dark'
-      }
-    }
+    return defaultConfig
   }
 }
 
