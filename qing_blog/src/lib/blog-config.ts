@@ -41,59 +41,69 @@ function getBlogConfig(): BlogConfig {
   }
   
   try {
-    // 🔧 只在服务端环境中引用Node.js模块
+    // 首先尝试读取构建时复制的配置文件
+    try {
+      const config = require('../../../blog.config.runtime.js')
+      if (config && typeof config === 'object') {
+        console.log('✅ 成功读取运行时配置:', config?.name || '未知名称')
+        const mergedConfig = { ...defaultConfig, ...config }
+        cachedConfig = mergedConfig
+        return mergedConfig
+      }
+    } catch {
+      // 忽略错误，继续尝试其他方法
+    }
+
+    // 备用方案：尝试读取原始配置文件
     const fs = eval('require')('fs')
     const path = eval('require')('path')
     
-    // 尝试静态路径策略，优先级从高到低
     const possiblePaths = [
-      // 策略1：从 qing_blog 目录回到上级目录（最常用的路径）
       path.resolve(process.cwd(), '../blog.config.js'),
-      // 策略2：当前目录的blog.config.js（备用）
       path.resolve(process.cwd(), 'blog.config.js'),
-      // 策略3：Vercel构建环境可能的路径
       path.resolve(__dirname, '../../../blog.config.js')
     ]
     
     for (const configPath of possiblePaths) {
       try {
-        // 检查文件是否存在
         if (fs.existsSync(configPath)) {
-          // 清除require缓存
+          console.log(`✅ 找到配置文件: ${configPath}`)
           const requireFunc = eval('require')
           delete requireFunc.cache[configPath]
           const config = requireFunc(configPath)
+          
           if (config && typeof config === 'object') {
-            console.log('✅ 成功读取博客配置:', config?.name || '未知')
-            cachedConfig = { ...defaultConfig, ...config }
-            return cachedConfig
+            console.log('✅ 成功读取博客配置:', config?.name || '未知名称')
+            const mergedConfig = { ...defaultConfig, ...config }
+            cachedConfig = mergedConfig
+            return mergedConfig
           }
         }
       } catch (error) {
-        // 静默处理错误，继续尝试下一个路径
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        console.warn(`⚠️ 路径 ${configPath} 读取失败:`, errorMessage)
         continue
       }
     }
     
-    // 如果所有静态路径都失败，尝试相对路径（保持向后兼容）
-    try {
-      const requireFunc = eval('require')
-      const config = requireFunc('../../../blog.config.js')
-      console.log('✅ 通过相对路径成功读取博客配置:', config?.name || '未知')
-      cachedConfig = { ...defaultConfig, ...config }
-      return cachedConfig
-    } catch (error) {
-      console.warn('⚠️ 所有配置文件路径都无法访问，使用默认配置')
-    }
+    console.warn('⚠️ 无法读取blog.config.js，使用默认配置')
+    console.log('📁 当前工作目录:', process.cwd())
     
-    cachedConfig = defaultConfig
-    return defaultConfig
   } catch (error) {
-    console.warn('⚠️ 配置读取异常，使用默认配置:', error instanceof Error ? error.message : String(error))
-    cachedConfig = defaultConfig
-    return defaultConfig
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('❌ 配置读取异常:', errorMessage)
   }
+
+  // 返回默认配置
+  cachedConfig = defaultConfig
+  return defaultConfig
 }
 
-export { getBlogConfig }
+// 导出函数，支持强制重新读取配置
+function reloadBlogConfig(): BlogConfig {
+  cachedConfig = null
+  return getBlogConfig()
+}
+
+export { getBlogConfig, reloadBlogConfig }
 export type { BlogConfig } 
